@@ -1,6 +1,11 @@
-// Centralized API Service for Job Portal Frontend
+const getApiBase = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return '/api';
+  const cleanUrl = envUrl.replace(/\/+$/, '');
+  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+};
 
-const API_BASE = '/api';
+const API_BASE = getApiBase();
 
 const getHeaders = (token, isFormData = false) => {
   const headers = {};
