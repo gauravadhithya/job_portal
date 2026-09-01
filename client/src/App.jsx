@@ -233,7 +233,7 @@ function App() {
 
           {error && (
             <div className="alert alert-danger" style={{ marginBottom: '2rem' }}>
-              <strong>Notice:</strong> {error}. (Ensure your backend server is running at <code>http://localhost:5001</code>)
+              <strong>Notice:</strong> {error}
             </div>
           )}
 

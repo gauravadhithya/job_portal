@@ -1,6 +1,5 @@
 const getApiBase = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (!envUrl) return '/api';
+  const envUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://job-portal-mrvr.onrender.com' : '/api');
   const cleanUrl = envUrl.replace(/\/+$/, '');
   return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
 };

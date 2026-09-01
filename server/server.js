@@ -15,8 +15,22 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+  'https://job-portall-swart.vercel.app',
+  'https://job-portall.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
 app.use(cors({
-  origin: 'https://job-portall-swart.vercel.app/'
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app') || origin.includes('localhost')) {
+      callback(null, true);
+    } else {
+      callback(null, true);
+    }
+  },
+  credentials: true,
 }));
 app.use(express.json());
 
