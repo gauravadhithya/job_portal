@@ -16,7 +16,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: 'https://job-portall-f6qf1zhpk-jac-medialand1.vercel.app/'
+  origin: 'https://job-portall-swart.vercel.app/'
 }));
 app.use(express.json());
 
