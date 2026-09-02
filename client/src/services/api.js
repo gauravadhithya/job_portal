@@ -55,6 +55,23 @@ export const api = {
     return handleResponse(res, 'Login failed');
   },
 
+  async updateProfile(profileData, token) {
+    const res = await fetch(`${API_BASE}/auth/profile`, {
+      method: 'PATCH',
+      headers: getHeaders(token),
+      body: JSON.stringify(profileData),
+    });
+    return handleResponse(res, 'Failed to update profile');
+  },
+
+  async getPublicProfile(username) {
+    const res = await fetch(`${API_BASE}/auth/users/${encodeURIComponent(username)}`, {
+      method: 'GET',
+      headers: getHeaders(),
+    });
+    return handleResponse(res, 'Failed to load user profile');
+  },
+
   // Jobs API
   async getJobs(token, filters = {}) {
     const params = new URLSearchParams();

@@ -9,7 +9,6 @@ const registerUser = async (req, res) => {
       email,
       password,
       role,
-      profileImage,
       degree,
       batch,
       college,
@@ -39,7 +38,6 @@ const registerUser = async (req, res) => {
       email: email.trim().toLowerCase(),
       password: hashedPassword,
       role: userRole,
-      profileImage: profileImage ? profileImage.trim() : '',
       isApproved,
     };
 
@@ -62,7 +60,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      profileImage: user.profileImage,
+      profileImage: user.profileImage || '',
       isApproved: user.isApproved,
       degree: user.degree,
       batch: user.batch,
@@ -113,7 +111,7 @@ const loginUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      profileImage: user.profileImage,
+      profileImage: user.profileImage || '',
       isApproved: user.isApproved,
       degree: user.degree,
       batch: user.batch,
@@ -130,4 +128,107 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const {
+      name,
+      profileImage,
+      degree,
+      batch,
+      college,
+      phone,
+      companyName,
+      industry,
+      website,
+      location,
+    } = req.body;
+
+    if (name !== undefined) user.name = name.trim();
+    if (profileImage !== undefined) user.profileImage = profileImage.trim();
+    if (degree !== undefined) user.degree = degree.trim();
+    if (batch !== undefined) user.batch = batch.trim();
+    if (college !== undefined) user.college = college.trim();
+    if (phone !== undefined) user.phone = phone.trim();
+    if (companyName !== undefined) user.companyName = companyName.trim();
+    if (industry !== undefined) user.industry = industry.trim();
+    if (website !== undefined) user.website = website.trim();
+    if (location !== undefined) user.location = location.trim();
+
+    await user.save();
+
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      profileImage: user.profileImage || '',
+      isApproved: user.isApproved,
+      degree: user.degree,
+      batch: user.batch,
+      college: user.college,
+      phone: user.phone,
+      companyName: user.companyName,
+      industry: user.industry,
+      website: user.website,
+      location: user.location,
+      message: 'Profile updated successfully!',
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update profile', error: error.message });
+  }
+};
+
+const getPublicProfile = async (req, res) => {
+  try {
+    const { username } = req.params;
+    if (!username) {
+      return res.status(400).json({ message: 'Username parameter required' });
+    }
+
+    // Try finding by exact name or regex case-insensitive, replacing dashes with spaces
+    const cleanName = decodeURIComponent(username).replace(/-/g, ' ').trim();
+    
+    let user = await User.findOne({
+      $or: [
+        { name: new RegExp(`^${cleanName}$`, 'i') },
+        { email: cleanName.toLowerCase() },
+      ],
+    }).select('-password');
+
+    // If not found and username looks like a MongoDB ObjectId
+    if (!user && username.match(/^[0-9a-fA-F]{24}$/)) {
+      user = await User.findById(username).select('-password');
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      profileImage: user.profileImage || '',
+      isApproved: user.isApproved,
+      degree: user.degree,
+      batch: user.batch,
+      college: user.college,
+      phone: user.phone,
+      companyName: user.companyName,
+      industry: user.industry,
+      website: user.website,
+      location: user.location,
+      createdAt: user.createdAt,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving profile', error: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, updateProfile, getPublicProfile };

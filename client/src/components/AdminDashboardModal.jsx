@@ -1,6 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import {
+  FiX,
+  FiClock,
+  FiCheck,
+  FiTrash2,
+  FiUser,
+  FiShield,
+  FiPlus,
+  FiMail,
+  FiMapPin,
+  FiCheckCircle,
+} from 'react-icons/fi';
+import { BsBuilding } from 'react-icons/bs';
 
 export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
   const { token } = useAuth();
@@ -119,7 +132,7 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
             </p>
           </div>
           <button className="close-btn" onClick={onClose}>
-            ✕
+            <FiX size={18} />
           </button>
         </div>
 
@@ -136,7 +149,7 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
             onClick={() => setActiveTab('pending')}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
           >
-            ⏳ Pending Approvals
+            <FiClock size={13} /> Pending Approvals
             {pendingCompanies.length > 0 && (
               <span
                 style={{
@@ -221,7 +234,9 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
 
             {pendingCompanies.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon">✅</div>
+                <div className="empty-state-icon">
+                  <FiCheckCircle size={36} style={{ color: '#16a34a' }} />
+                </div>
                 <h3>No pending company approvals</h3>
                 <p style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>
                   All registered company and recruiter accounts are currently approved and active.
@@ -275,8 +290,10 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
                         <span className="role-pill" style={{ marginLeft: '0.5rem', background: '#fef3c7', color: '#92400e' }}>
                           Pending Approval
                         </span>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
-                          ✉️ {comp.email} {comp.industry ? `• 🏢 ${comp.industry}` : ''} {comp.location ? `• 📍 ${comp.location}` : ''}
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><FiMail size={12} /> {comp.email}</span>
+                          {comp.industry && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>• <BsBuilding size={12} /> {comp.industry}</span>}
+                          {comp.location && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>• <FiMapPin size={12} /> {comp.location}</span>}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                           Registered on {new Date(comp.createdAt).toLocaleDateString()}
@@ -287,17 +304,18 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button
                         className="btn btn-primary btn-sm"
-                        style={{ background: '#16a34a', borderColor: '#16a34a' }}
+                        style={{ background: '#16a34a', borderColor: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                         disabled={actionLoadingId === comp._id}
                         onClick={() => handleApproveCompany(comp._id, comp.name)}
                       >
-                        {actionLoadingId === comp._id ? 'Approving...' : '✓ Approve Company'}
+                        <FiCheck size={13} /> {actionLoadingId === comp._id ? 'Approving...' : 'Approve Company'}
                       </button>
                       <button
                         className="btn btn-danger btn-sm"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                         onClick={() => handleDeleteUser(comp._id, comp.name)}
                       >
-                        ✕ Reject
+                        <FiTrash2 size={13} /> Reject
                       </button>
                     </div>
                   </div>
@@ -324,8 +342,9 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
               <button
                 className="btn btn-primary btn-sm"
                 onClick={() => setShowAddCompany(!showAddCompany)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
               >
-                {showAddCompany ? '✕ Cancel' : '+ Register New Company'}
+                {showAddCompany ? <><FiX size={13} /> Cancel</> : <><FiPlus size={13} /> Register New Company</>}
               </button>
             </div>
 
@@ -440,7 +459,7 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
                             onError={(e) => { e.target.style.display = 'none'; }}
                           />
                         ) : (
-                          <span style={{ fontWeight: 700 }}>🏢</span>
+                          <FiBuilding size={16} style={{ color: '#64748b' }} />
                         )}
                         <div>
                           <strong style={{ fontSize: '0.95rem' }}>{comp.name}</strong>
@@ -464,18 +483,19 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
                         {isPending && (
                           <button
                             className="btn btn-primary btn-sm"
-                            style={{ background: '#16a34a', borderColor: '#16a34a' }}
+                            style={{ background: '#16a34a', borderColor: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                             disabled={actionLoadingId === comp._id}
                             onClick={() => handleApproveCompany(comp._id, comp.name)}
                           >
-                            ✓ Approve
+                            <FiCheck size={12} /> Approve
                           </button>
                         )}
                         <button
                           className="btn btn-danger btn-sm"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                           onClick={() => handleDeleteUser(comp._id, comp.name)}
                         >
-                          Remove
+                          <FiTrash2 size={12} /> Remove
                         </button>
                       </div>
                     </div>
@@ -520,7 +540,7 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
                           onError={(e) => { e.target.style.display = 'none'; }}
                         />
                       ) : (
-                        <span>👤</span>
+                        <FiUser size={16} style={{ color: '#64748b' }} />
                       )}
                       <div>
                         <strong style={{ fontSize: '0.95rem' }}>{cand.name}</strong>
@@ -537,9 +557,10 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
 
                     <button
                       className="btn btn-danger btn-sm"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                       onClick={() => handleDeleteUser(cand._id, cand.name)}
                     >
-                      Remove
+                      <FiTrash2 size={12} /> Remove
                     </button>
                   </div>
                 ))}

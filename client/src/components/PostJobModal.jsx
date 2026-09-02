@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { FiX, FiPlusCircle } from 'react-icons/fi';
 
 export const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
   const { token, user } = useAuth();
@@ -52,7 +53,7 @@ export const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
         token
       );
 
-      onSuccess('Job opportunity posted successfully!');
+      if (onSuccess) onSuccess('Job opportunity posted successfully!');
       onClose();
     } catch (err) {
       setError(err.message || 'Failed to post job');
@@ -72,7 +73,7 @@ export const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
             </p>
           </div>
           <button className="close-btn" onClick={onClose}>
-            ✕
+            <FiX size={18} />
           </button>
         </div>
 
@@ -168,10 +169,10 @@ export const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.75rem' }}
+            style={{ width: '100%', padding: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
             disabled={submitting}
           >
-            {submitting ? 'Publishing...' : 'Publish Job Listing'}
+            <FiPlusCircle size={15} /> {submitting ? 'Publishing...' : 'Publish Job Listing'}
           </button>
         </form>
       </div>

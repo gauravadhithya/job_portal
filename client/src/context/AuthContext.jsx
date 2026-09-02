@@ -72,6 +72,30 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const updateUser = async (profileData) => {
+    const data = await api.updateProfile(profileData, token);
+    if (data._id) {
+      const updatedUser = {
+        ...user,
+        name: data.name,
+        email: data.email,
+        profileImage: data.profileImage,
+        degree: data.degree,
+        batch: data.batch,
+        college: data.college,
+        phone: data.phone,
+        companyName: data.companyName,
+        industry: data.industry,
+        website: data.website,
+        location: data.location,
+      };
+      setUser(updatedUser);
+      sessionStorage.setItem('job_portal_user', JSON.stringify(updatedUser));
+      localStorage.setItem('job_portal_user', JSON.stringify(updatedUser));
+    }
+    return data;
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -89,6 +113,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         register,
+        updateUser,
         logout,
         isAuthenticated: !!user && !!token,
         isCompany: user?.role === 'Company' || user?.role === 'Recruiter',

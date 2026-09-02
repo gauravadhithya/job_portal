@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { FiX, FiSend, FiLink } from 'react-icons/fi';
 
 export const ApplyModal = ({ job, isOpen, onClose, onSuccess }) => {
   const { token } = useAuth();
@@ -30,7 +31,7 @@ export const ApplyModal = ({ job, isOpen, onClose, onSuccess }) => {
         token
       );
 
-      onSuccess('Application submitted successfully!');
+      if (onSuccess) onSuccess('Application submitted successfully!');
       setResumeUrl('');
       onClose();
     } catch (err) {
@@ -51,7 +52,7 @@ export const ApplyModal = ({ job, isOpen, onClose, onSuccess }) => {
             </p>
           </div>
           <button className="close-btn" onClick={onClose}>
-            ✕
+            <FiX size={18} />
           </button>
         </div>
 
@@ -59,7 +60,9 @@ export const ApplyModal = ({ job, isOpen, onClose, onSuccess }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="input-group" style={{ marginBottom: '1.5rem' }}>
-            <label className="input-label">Resume / Portfolio Link</label>
+            <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <FiLink size={13} /> Resume / Portfolio Link
+            </label>
             <input
               type="url"
               className="form-input"
@@ -77,10 +80,10 @@ export const ApplyModal = ({ job, isOpen, onClose, onSuccess }) => {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.75rem' }}
+            style={{ width: '100%', padding: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
             disabled={submitting}
           >
-            {submitting ? 'Submitting Application...' : 'Submit Application'}
+            <FiSend size={14} /> {submitting ? 'Submitting Application...' : 'Submit Application'}
           </button>
         </form>
       </div>

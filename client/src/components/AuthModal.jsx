@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import {
+  FiX,
+  FiUser,
+  FiInfo,
+} from 'react-icons/fi';
+import { BsBuilding } from 'react-icons/bs';
 
-export const AuthModal = ({ isOpen, onClose }) => {
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole = 'Job Seeker' }) => {
+  const [mode, setMode] = useState(initialMode); // 'login' | 'register'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    role: 'Job Seeker', // 'Job Seeker' | 'Company'
+    role: initialRole, // 'Job Seeker' | 'Company'
     profileImage: '',
     degree: '',
     batch: '',
@@ -24,14 +30,15 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
   const { login, register } = useAuth();
 
-  // Reset form whenever modal opens or mode changes
+  // Reset form whenever modal opens
   useEffect(() => {
     if (isOpen) {
+      setMode(initialMode || 'login');
       setFormData({
         name: '',
         email: '',
         password: '',
-        role: 'Job Seeker',
+        role: initialRole || 'Job Seeker',
         profileImage: '',
         degree: '',
         batch: '',
@@ -45,7 +52,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
       setError('');
       setNotice('');
     }
-  }, [isOpen, mode]);
+  }, [isOpen, initialMode, initialRole]);
 
   if (!isOpen) return null;
 
@@ -133,7 +140,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
             </p>
           </div>
           <button className="close-btn" onClick={onClose}>
-            ✕
+            <FiX size={18} />
           </button>
         </div>
 
@@ -176,20 +183,22 @@ export const AuthModal = ({ isOpen, onClose }) => {
                     type="button"
                     className={`btn btn-sm ${formData.role === 'Job Seeker' ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => setFormData({ ...formData, role: 'Job Seeker' })}
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
                   >
-                    👤 Job Seeker (Candidate)
+                    <FiUser size={14} /> Job Seeker (Candidate)
                   </button>
                   <button
                     type="button"
                     className={`btn btn-sm ${formData.role === 'Company' ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => setFormData({ ...formData, role: 'Company' })}
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
                   >
-                    🏢 Company / Recruiter
+                    <BsBuilding size={14} /> Company / Recruiter
                   </button>
                 </div>
                 {formData.role === 'Company' && (
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-                    ℹ️ Company registrations are verified and approved by the Platform Administrator.
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <FiInfo size={12} /> Company registrations are verified and approved by the Platform Administrator.
                   </p>
                 )}
               </div>
@@ -208,22 +217,6 @@ export const AuthModal = ({ isOpen, onClose }) => {
                   onChange={handleChange}
                   autoComplete="off"
                   required
-                />
-              </div>
-
-              {/* Profile Image URL */}
-              <div className="input-group" style={{ marginBottom: '1rem' }}>
-                <label className="input-label">
-                  {formData.role === 'Company' ? 'Company Logo URL (Optional)' : 'Profile Image / Avatar URL (Optional)'}
-                </label>
-                <input
-                  type="url"
-                  name="profileImage"
-                  className="form-input"
-                  placeholder="https://images.unsplash.com/... or avatar link"
-                  value={formData.profileImage}
-                  onChange={handleChange}
-                  autoComplete="off"
                 />
               </div>
 

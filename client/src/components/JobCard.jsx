@@ -1,5 +1,13 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import {
+  FiClock,
+  FiMapPin,
+  FiFileText,
+  FiTrash2,
+  FiArrowRight,
+} from 'react-icons/fi';
+import { BsBuilding } from 'react-icons/bs';
 
 export const JobCard = ({
   job,
@@ -49,11 +57,11 @@ export const JobCard = ({
                 {companyInitial}
               </div>
               <div>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a', margin: 0 }}>
-                  {companyName}
+                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <BsBuilding size={13} style={{ color: '#64748b' }} /> {companyName}
                 </h4>
-                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                  {job.location || 'Remote'}
+                <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.1rem' }}>
+                  <FiMapPin size={11} /> {job.location || 'Remote'}
                 </span>
               </div>
             </div>
@@ -71,7 +79,9 @@ export const JobCard = ({
           </h3>
 
           <div className="job-meta">
-            <span className="job-meta-item">⏳ Deadline: {formattedDeadline}</span>
+            <span className="job-meta-item" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <FiClock size={12} /> Deadline: {formattedDeadline}
+            </span>
           </div>
         </div>
 
@@ -95,9 +105,9 @@ export const JobCard = ({
           {isAdmin ? (
             <button
               className="btn btn-danger btn-sm"
-              onClick={() => onDeleteJob(job)}
+              onClick={() => onDeleteJob(job._id)}
             >
-              Delete Job
+              <FiTrash2 size={13} /> Delete Job
             </button>
           ) : isCompany ? (
             <>
@@ -105,7 +115,7 @@ export const JobCard = ({
                 className="btn btn-secondary btn-sm"
                 onClick={() => onViewApplicants(job)}
               >
-                Applicants 📋
+                <FiFileText size={13} /> Applicants
               </button>
               <button
                 className={`btn btn-sm ${isClosed ? 'btn-primary' : 'btn-secondary'}`}
@@ -115,9 +125,9 @@ export const JobCard = ({
               </button>
               <button
                 className="btn btn-danger btn-sm"
-                onClick={() => onDeleteJob(job)}
+                onClick={() => onDeleteJob(job._id)}
               >
-                Delete
+                <FiTrash2 size={13} /> Delete
               </button>
             </>
           ) : (
@@ -125,14 +135,14 @@ export const JobCard = ({
               className="btn btn-primary btn-sm"
               disabled={isClosed}
               onClick={() => {
-                if (!isAuthenticated) {
+                if (!isAuthenticated && onRequireAuth) {
                   onRequireAuth();
                 } else {
                   onApply(job);
                 }
               }}
             >
-              {isClosed ? 'Position Closed' : 'Apply Now →'}
+              {isClosed ? 'Position Closed' : <>Apply Now <FiArrowRight size={13} /></>}
             </button>
           )}
         </div>

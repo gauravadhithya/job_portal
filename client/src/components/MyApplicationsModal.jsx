@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import {
+  FiX,
+  FiFileText,
+  FiMapPin,
+  FiExternalLink,
+  FiInbox,
+} from 'react-icons/fi';
+import { BsBuilding } from 'react-icons/bs';
 
 export const MyApplicationsModal = ({ isOpen, onClose }) => {
   const { token } = useAuth();
@@ -45,7 +53,7 @@ export const MyApplicationsModal = ({ isOpen, onClose }) => {
             </p>
           </div>
           <button className="close-btn" onClick={onClose}>
-            ✕
+            <FiX size={18} />
           </button>
         </div>
 
@@ -57,7 +65,9 @@ export const MyApplicationsModal = ({ isOpen, onClose }) => {
           </div>
         ) : applications.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-state-icon">📋</div>
+            <div className="empty-state-icon">
+              <FiInbox size={36} />
+            </div>
             <h3>No applications submitted yet</h3>
             <p style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>
               Browse opportunities and click "Apply Now" to start tracking your applications.
@@ -110,8 +120,8 @@ export const MyApplicationsModal = ({ isOpen, onClose }) => {
                       <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
                         {job.title || 'Position Title'}
                       </h3>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
-                        🏢 {companyName} • 📍 {job.location || 'Remote'}
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.15rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <BsBuilding size={12} /> {companyName} • <FiMapPin size={11} /> {job.location || 'Remote'}
                       </p>
                     </div>
 
@@ -137,9 +147,9 @@ export const MyApplicationsModal = ({ isOpen, onClose }) => {
                         href={app.resume}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: '#0f172a', fontWeight: 500, textDecoration: 'underline' }}
+                        style={{ color: '#0f172a', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'underline' }}
                       >
-                        View Submitted Link ↗
+                        View Resume <FiExternalLink size={12} />
                       </a>
                     )}
                   </div>
