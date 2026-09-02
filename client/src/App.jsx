@@ -12,6 +12,7 @@ import { UserProfileBanner } from './components/UserProfileBanner';
 import { ProfilePage } from './pages/ProfilePage';
 import { useAuth } from './context/AuthContext';
 import { api } from './services/api';
+import heroIllustration from './assets/landing-hero.jpg';
 import {
   FiBriefcase,
   FiTrendingUp,
@@ -272,7 +273,7 @@ export function App() {
             }}
           >
             <img
-              src="/assets/landing-hero.jpg"
+              src={heroIllustration}
               alt="Work & Career Opportunities"
               style={{
                 width: '100%',
