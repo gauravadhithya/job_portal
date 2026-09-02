@@ -211,13 +211,25 @@ export const api = {
     return handleResponse(res, 'Failed to fetch users');
   },
 
-  async createRecruiter(recruiterData, token) {
-    const res = await fetch(`${API_BASE}/admin/recruiters`, {
+  async createCompany(companyData, token) {
+    const res = await fetch(`${API_BASE}/admin/companies`, {
       method: 'POST',
       headers: getHeaders(token),
-      body: JSON.stringify(recruiterData),
+      body: JSON.stringify(companyData),
     });
-    return handleResponse(res, 'Failed to register recruiter account');
+    return handleResponse(res, 'Failed to register company account');
+  },
+
+  async createRecruiter(recruiterData, token) {
+    return this.createCompany(recruiterData, token);
+  },
+
+  async approveCompany(userId, token) {
+    const res = await fetch(`${API_BASE}/admin/users/${userId}/approve`, {
+      method: 'PATCH',
+      headers: getHeaders(token),
+    });
+    return handleResponse(res, 'Failed to approve account');
   },
 
   async deleteAdminUser(userId, token) {

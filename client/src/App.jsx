@@ -12,7 +12,7 @@ import { AdminDashboardModal } from './components/AdminDashboardModal';
 import { MyApplicationsModal } from './components/MyApplicationsModal';
 
 function App() {
-  const { user, token, isRecruiter, isJobSeeker, isAdmin, loading: authLoading } = useAuth();
+  const { user, token, isCompany, isJobSeeker, isAdmin, loading: authLoading } = useAuth();
 
   // State
   const [jobs, setJobs] = useState([]);
@@ -20,7 +20,7 @@ function App() {
   const [error, setError] = useState('');
   const [notification, setNotification] = useState('');
   const [filters, setFilters] = useState({});
-  const [recruiterStatusFilter, setRecruiterStatusFilter] = useState('All'); // 'All' | 'Open' | 'Closed'
+  const [companyStatusFilter, setCompanyStatusFilter] = useState('All'); // 'All' | 'Open' | 'Closed'
 
   // Modals state
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -86,21 +86,21 @@ function App() {
     }
   };
 
-  // Filter jobs for recruiter if they only want their own / specific status
+  // Filter jobs for company if they only want their own / specific status
   const displayedJobs = jobs.filter((job) => {
-    if (isRecruiter) {
-      const recId = job.recruiterId?._id?.toString() || job.recruiterId?.toString();
+    if (isCompany) {
+      const recId = job.recruiterId?._id?.toString() || job.recruiterId?.toString() || job.companyId?._id?.toString() || job.companyId?.toString();
       const currentUserId = user?._id?.toString();
       const isMyJob = !recId || recId === currentUserId;
 
-      if (recruiterStatusFilter === 'Open') return isMyJob && job.status === 'Open';
-      if (recruiterStatusFilter === 'Closed') return isMyJob && job.status === 'Closed';
+      if (companyStatusFilter === 'Open') return isMyJob && job.status === 'Open';
+      if (companyStatusFilter === 'Closed') return isMyJob && job.status === 'Closed';
       return isMyJob;
     }
     if (isAdmin) {
-      return true; // Admins view all platform jobs with moderation control
+      return true; // Platform admin oversees all platform jobs
     }
-    // Job seekers only see open jobs
+    // Job seekers view all open jobs
     return job.status === 'Open' || !job.status;
   });
 
@@ -147,7 +147,7 @@ function App() {
                   JobPortal Administration Hub
                 </h1>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  Manage platform users, oversee registered recruiters, and monitor platform statistics.
+                  Manage companies, oversee registered candidates, and monitor system analytics.
                 </p>
               </div>
 
@@ -160,8 +160,8 @@ function App() {
                 </button>
               </div>
             </div>
-          ) : isRecruiter ? (
-            /* Recruiter Workspace Banner */
+          ) : isCompany ? (
+            /* Company Workspace Banner */
             <div
               style={{
                 background: '#f8fafc',
@@ -169,18 +169,32 @@ function App() {
                 borderRadius: 'var(--radius-lg)',
                 padding: '2rem 1.5rem',
                 marginBottom: '2rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '1.25rem',
               }}
             >
               <div>
                 <span className="role-pill" style={{ marginBottom: '0.5rem', display: 'inline-block' }}>
-                  Recruiter Workspace
+                  Company Workspace
                 </span>
                 <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', margin: '0.25rem 0' }}>
                   {user?.name}’s Job Postings
                 </h1>
                 <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  Manage your company's open positions, track applicants, and review submissions.
+                  Manage your open positions, track applicants, and review submissions.
                 </p>
+              </div>
+
+              <div>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowPostJobModal(true)}
+                >
+                  + Post a New Job
+                </button>
               </div>
             </div>
           ) : (
@@ -206,21 +220,21 @@ function App() {
               <h2 className="jobs-title">
                 {isAdmin
                   ? 'All Platform Job Listings'
-                  : isRecruiter
+                  : isCompany
                   ? 'Your Company Postings'
                   : 'Featured Opportunities'}{' '}
                 ({displayedJobs.length})
               </h2>
             </div>
 
-            {/* Recruiter quick status tabs */}
-            {isRecruiter && (
+            {/* Company quick status tabs */}
+            {isCompany && (
               <div style={{ display: 'flex', gap: '0.4rem' }}>
                 {['All', 'Open', 'Closed'].map((st) => (
                   <button
                     key={st}
-                    className={`btn btn-sm ${recruiterStatusFilter === st ? 'btn-primary' : 'btn-secondary'}`}
-                    onClick={() => setRecruiterStatusFilter(st)}
+                    className={`btn btn-sm ${companyStatusFilter === st ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setCompanyStatusFilter(st)}
                   >
                     {st} Postings
                   </button>
@@ -245,11 +259,11 @@ function App() {
             <div className="empty-state">
               <div className="empty-state-icon">💼</div>
               <h3>
-                {isRecruiter
+                {isCompany
                   ? "You haven't posted any jobs under this status yet."
                   : 'No job listings found.'}
               </h3>
-              {isRecruiter && (
+              {isCompany && (
                 <button
                   className="btn btn-primary"
                   style={{ marginTop: '1rem' }}

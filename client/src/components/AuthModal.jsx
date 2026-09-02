@@ -7,14 +7,24 @@ export const AuthModal = ({ isOpen, onClose }) => {
     name: '',
     email: '',
     password: '',
-    role: 'Job Seeker',
+    role: 'Job Seeker', // 'Job Seeker' | 'Company'
+    profileImage: '',
+    degree: '',
+    batch: '',
+    college: '',
+    phone: '',
+    companyName: '',
+    industry: '',
+    website: '',
+    location: '',
   });
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const { login, register } = useAuth();
 
-  // Reset form whenever modal opens or closes
+  // Reset form whenever modal opens or mode changes
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -22,8 +32,18 @@ export const AuthModal = ({ isOpen, onClose }) => {
         email: '',
         password: '',
         role: 'Job Seeker',
+        profileImage: '',
+        degree: '',
+        batch: '',
+        college: '',
+        phone: '',
+        companyName: '',
+        industry: '',
+        website: '',
+        location: '',
       });
       setError('');
+      setNotice('');
     }
   }, [isOpen, mode]);
 
@@ -39,18 +59,54 @@ export const AuthModal = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setNotice('');
     setSubmitting(true);
 
     try {
       if (mode === 'login') {
         await login(formData.email, formData.password);
+        onClose();
       } else {
         if (!formData.name.trim()) {
-          throw new Error('Please enter your full name');
+          throw new Error(
+            formData.role === 'Company' ? 'Please enter your company name' : 'Please enter your full name'
+          );
         }
-        await register(formData.name, formData.email, formData.password, 'Job Seeker');
+
+        if (formData.role === 'Job Seeker') {
+          if (!formData.degree.trim()) {
+            throw new Error('Please specify your Degree / Qualification (e.g. B.Tech, BCA, MCA)');
+          }
+          if (!formData.batch.trim()) {
+            throw new Error('Please enter your Batch / Graduation Year (e.g. 2025, 2026)');
+          }
+        }
+
+        const res = await register({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+          profileImage: formData.profileImage,
+          degree: formData.degree,
+          batch: formData.batch,
+          college: formData.college,
+          phone: formData.phone,
+          companyName: formData.role === 'Company' ? formData.name : formData.companyName,
+          industry: formData.industry,
+          website: formData.website,
+          location: formData.location,
+        });
+
+        // If company registered, they need approval before signing in
+        if (formData.role === 'Company' || res?.isApproved === false) {
+          setNotice('Registration submitted! Your company/recruiter account is pending Platform Admin approval before you can sign in.');
+          setMode('login');
+          return;
+        }
+
+        onClose();
       }
-      onClose();
     } catch (err) {
       setError(err.message || 'Authentication failed');
     } finally {
@@ -60,11 +116,22 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-content"
+        style={{ maxWidth: mode === 'register' ? '580px' : '440px' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
-          <h2 className="modal-title">
-            {mode === 'login' ? 'Welcome Back' : 'Create Job Seeker Account'}
-          </h2>
+          <div>
+            <h2 className="modal-title">
+              {mode === 'login' ? 'Welcome Back' : 'Create Account'}
+            </h2>
+            <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)' }}>
+              {mode === 'login'
+                ? 'Sign in to access your portal account'
+                : 'Join as a Candidate or Company Recruiter'}
+            </p>
+          </div>
           <button className="close-btn" onClick={onClose}>
             ✕
           </button>
@@ -76,6 +143,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
             onClick={() => {
               setMode('login');
               setError('');
+              setNotice('');
             }}
           >
             Sign In
@@ -85,38 +153,212 @@ export const AuthModal = ({ isOpen, onClose }) => {
             onClick={() => {
               setMode('register');
               setError('');
+              setNotice('');
             }}
           >
-            Register (Candidate)
+            Register
           </button>
         </div>
 
+        {notice && <div className="alert alert-success">{notice}</div>}
         {error && <div className="alert alert-danger">{error}</div>}
 
         <form onSubmit={handleSubmit} autoComplete="off">
           {mode === 'register' && (
-            <div className="input-group" style={{ marginBottom: '1rem' }}>
-              <label className="input-label">Full Name</label>
-              <input
-                type="text"
-                name="name"
-                className="form-input"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChange={handleChange}
-                autoComplete="off"
-                required
-              />
-            </div>
+            <>
+              {/* Role Toggle Selector */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label className="input-label" style={{ marginBottom: '0.4rem', display: 'block' }}>
+                  Select Account Type
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    className={`btn btn-sm ${formData.role === 'Job Seeker' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setFormData({ ...formData, role: 'Job Seeker' })}
+                  >
+                    👤 Job Seeker (Candidate)
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-sm ${formData.role === 'Company' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setFormData({ ...formData, role: 'Company' })}
+                  >
+                    🏢 Company / Recruiter
+                  </button>
+                </div>
+                {formData.role === 'Company' && (
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+                    ℹ️ Company registrations are verified and approved by the Platform Administrator.
+                  </p>
+                )}
+              </div>
+
+              {/* Basic Info */}
+              <div className="input-group" style={{ marginBottom: '1rem' }}>
+                <label className="input-label">
+                  {formData.role === 'Company' ? 'Company Name *' : 'Full Name *'}
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  className="form-input"
+                  placeholder={formData.role === 'Company' ? 'e.g. Acme Technologies' : 'e.g. Alex Smith'}
+                  value={formData.name}
+                  onChange={handleChange}
+                  autoComplete="off"
+                  required
+                />
+              </div>
+
+              {/* Profile Image URL */}
+              <div className="input-group" style={{ marginBottom: '1rem' }}>
+                <label className="input-label">
+                  {formData.role === 'Company' ? 'Company Logo URL (Optional)' : 'Profile Image / Avatar URL (Optional)'}
+                </label>
+                <input
+                  type="url"
+                  name="profileImage"
+                  className="form-input"
+                  placeholder="https://images.unsplash.com/... or avatar link"
+                  value={formData.profileImage}
+                  onChange={handleChange}
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* CANDIDATE SPECIFIC FIELDS */}
+              {formData.role === 'Job Seeker' && (
+                <>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '0.75rem',
+                      marginBottom: '1rem',
+                    }}
+                  >
+                    <div className="input-group">
+                      <label className="input-label">Degree / Qualification *</label>
+                      <input
+                        type="text"
+                        name="degree"
+                        className="form-input"
+                        placeholder="e.g. B.Tech CSE, MCA, B.Sc"
+                        value={formData.degree}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="input-group">
+                      <label className="input-label">Batch / Passing Year *</label>
+                      <input
+                        type="text"
+                        name="batch"
+                        className="form-input"
+                        placeholder="e.g. 2025, 2026"
+                        value={formData.batch}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '0.75rem',
+                      marginBottom: '1rem',
+                    }}
+                  >
+                    <div className="input-group">
+                      <label className="input-label">College / University</label>
+                      <input
+                        type="text"
+                        name="college"
+                        className="form-input"
+                        placeholder="e.g. Anna University, IIT..."
+                        value={formData.college}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="input-group">
+                      <label className="input-label">Phone Number</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        className="form-input"
+                        placeholder="e.g. +91 9876543210"
+                        value={formData.phone}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* COMPANY SPECIFIC FIELDS */}
+              {formData.role === 'Company' && (
+                <>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '0.75rem',
+                      marginBottom: '1rem',
+                    }}
+                  >
+                    <div className="input-group">
+                      <label className="input-label">Industry / Domain</label>
+                      <input
+                        type="text"
+                        name="industry"
+                        className="form-input"
+                        placeholder="e.g. Software, FinTech, AI"
+                        value={formData.industry}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="input-group">
+                      <label className="input-label">Company Location / HQ</label>
+                      <input
+                        type="text"
+                        name="location"
+                        className="form-input"
+                        placeholder="e.g. Bangalore, Remote"
+                        value={formData.location}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="input-group" style={{ marginBottom: '1rem' }}>
+                    <label className="input-label">Company Website URL</label>
+                    <input
+                      type="url"
+                      name="website"
+                      className="form-input"
+                      placeholder="e.g. https://company.com"
+                      value={formData.website}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </>
+              )}
+            </>
           )}
 
           <div className="input-group" style={{ marginBottom: '1rem' }}>
-            <label className="input-label">Email Address</label>
+            <label className="input-label">Email Address *</label>
             <input
               type="email"
               name="email"
               className="form-input"
-              placeholder="Enter your email ID"
+              placeholder={formData.role === 'Company' && mode === 'register' ? 'recruiter@company.com' : 'Enter your email ID'}
               value={formData.email}
               onChange={handleChange}
               autoComplete="off"
@@ -125,7 +367,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
           </div>
 
           <div className="input-group" style={{ marginBottom: '1.25rem' }}>
-            <label className="input-label">Password</label>
+            <label className="input-label">Password *</label>
             <input
               type="password"
               name="password"
@@ -148,23 +390,25 @@ export const AuthModal = ({ isOpen, onClose }) => {
               ? 'Please wait...'
               : mode === 'login'
               ? 'Sign In'
-              : 'Create Account'}
+              : `Register as ${formData.role === 'Company' ? 'Company / Recruiter' : 'Job Seeker'}`}
           </button>
         </form>
 
-        <div className="modal-footer">
+        <div style={{ textAlign: 'center', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
           {mode === 'login' ? (
             <p>
-              New candidate?{' '}
+              New user or recruiter?{' '}
               <a
                 href="#register"
+                style={{ fontWeight: 600, color: 'var(--text-primary)', textDecoration: 'underline' }}
                 onClick={(e) => {
                   e.preventDefault();
                   setMode('register');
                   setError('');
+                  setNotice('');
                 }}
               >
-                Register as Job Seeker
+                Register here
               </a>
             </p>
           ) : (
@@ -172,10 +416,12 @@ export const AuthModal = ({ isOpen, onClose }) => {
               Already have an account?{' '}
               <a
                 href="#login"
+                style={{ fontWeight: 600, color: 'var(--text-primary)', textDecoration: 'underline' }}
                 onClick={(e) => {
                   e.preventDefault();
                   setMode('login');
                   setError('');
+                  setNotice('');
                 }}
               >
                 Sign in here

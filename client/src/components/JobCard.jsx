@@ -9,7 +9,7 @@ export const JobCard = ({
   onDeleteJob,
   onRequireAuth,
 }) => {
-  const { isAuthenticated, isRecruiter, isAdmin } = useAuth();
+  const { isAuthenticated, isCompany, isAdmin } = useAuth();
 
   const formattedDeadline = job.deadline
     ? new Date(job.deadline).toLocaleDateString(undefined, {
@@ -53,7 +53,7 @@ export const JobCard = ({
                   {companyName}
                 </h4>
                 <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                  {job.location}
+                  {job.location || 'Remote'}
                 </span>
               </div>
             </div>
@@ -99,7 +99,7 @@ export const JobCard = ({
             >
               Delete Job
             </button>
-          ) : isRecruiter ? (
+          ) : isCompany ? (
             <>
               <button
                 className="btn btn-secondary btn-sm"

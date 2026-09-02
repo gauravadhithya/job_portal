@@ -67,7 +67,7 @@ export const MyApplicationsModal = ({ isOpen, onClose }) => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {applications.map((app) => {
               const job = app.jobId || {};
-              const companyName = job.recruiterId?.name || 'Company';
+              const companyName = job.companyId?.name || job.recruiterId?.name || 'Company';
               const appliedDate = app.appliedAt
                 ? new Date(app.appliedAt).toLocaleDateString(undefined, {
                     month: 'short',

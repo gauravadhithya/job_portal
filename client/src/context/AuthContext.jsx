@@ -36,6 +36,16 @@ export const AuthProvider = ({ children }) => {
         name: data.name,
         email: data.email,
         role: data.role,
+        profileImage: data.profileImage,
+        isApproved: data.isApproved,
+        degree: data.degree,
+        batch: data.batch,
+        college: data.college,
+        phone: data.phone,
+        companyName: data.companyName,
+        industry: data.industry,
+        website: data.website,
+        location: data.location,
       };
       setUser(userData);
       setToken(data.token);
@@ -48,11 +58,16 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const register = async (name, email, password, role) => {
-    const data = await api.register({ name, email, password, role });
+  const register = async (payloadOrName, email, password, role) => {
+    const payload =
+      typeof payloadOrName === 'object'
+        ? payloadOrName
+        : { name: payloadOrName, email, password, role };
+
+    const data = await api.register(payload);
     // After register, auto-login if successful
     if (data._id) {
-      return await login(email, password);
+      return await login(payload.email, payload.password);
     }
     return data;
   };
@@ -76,7 +91,8 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         isAuthenticated: !!user && !!token,
-        isRecruiter: user?.role === 'Recruiter',
+        isCompany: user?.role === 'Company' || user?.role === 'Recruiter',
+        isRecruiter: user?.role === 'Company' || user?.role === 'Recruiter',
         isJobSeeker: user?.role === 'Job Seeker',
         isAdmin: user?.role === 'Admin',
       }}

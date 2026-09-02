@@ -47,7 +47,7 @@ export const ApplyModal = ({ job, isOpen, onClose, onSuccess }) => {
           <div>
             <h2 className="modal-title">Apply for Job</h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              {job.title} • {job.location}
+              {job.title} • {job.location || 'Remote'}
             </p>
           </div>
           <button className="close-btn" onClick={onClose}>
@@ -70,7 +70,7 @@ export const ApplyModal = ({ job, isOpen, onClose, onSuccess }) => {
               autoFocus
             />
             <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.35rem' }}>
-              Paste a link to your resume (Google Drive, Dropbox, LinkedIn, or personal website).
+              Paste a link to your resume (Google Drive, Dropbox, LinkedIn, or personal portfolio).
             </span>
           </div>
 

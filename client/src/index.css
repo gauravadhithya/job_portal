@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -13,7 +13,7 @@
   --text-secondary: #475569;
   --text-muted: #94a3b8;
   
-  /* Simple Black & Monochrome Palette */
+  /* Black & Neutral Palette */
   --btn-primary-bg: #0f172a;
   --btn-primary-text: #ffffff;
   --btn-primary-hover: #334155;
@@ -120,6 +120,7 @@ a {
   font-size: 1.2rem;
   color: var(--text-primary);
   letter-spacing: -0.02em;
+  cursor: pointer;
 }
 
 .logo-ripple-badge {
@@ -168,7 +169,7 @@ a {
   letter-spacing: 0.04em;
 }
 
-/* Buttons - Simple Black & Neutral Styles */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -186,7 +187,7 @@ a {
   text-decoration: none;
 }
 
-/* Simple Solid Black Button */
+/* Solid Button */
 .btn-primary {
   background-color: var(--btn-primary-bg);
   color: var(--btn-primary-text);
@@ -204,7 +205,7 @@ a {
   cursor: not-allowed;
 }
 
-/* Simple White/Neutral Secondary Button */
+/* Secondary Button */
 .btn-secondary {
   background-color: #ffffff;
   color: var(--text-primary);
@@ -216,7 +217,7 @@ a {
   border-color: #cbd5e1;
 }
 
-/* Simple Clean Danger Button */
+/* Danger Button */
 .btn-danger {
   background-color: var(--danger-bg);
   color: var(--danger);
@@ -304,7 +305,7 @@ a {
   box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
 }
 
-/* Browser autofill clean light theme */
+/* Browser autofill clean theme */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus,
@@ -442,7 +443,7 @@ input:-webkit-autofill:active {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   width: 100%;
-  max-width: 540px;
+  max-width: 560px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: var(--shadow-lg);

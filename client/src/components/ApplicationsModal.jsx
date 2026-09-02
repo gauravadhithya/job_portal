@@ -116,15 +116,64 @@ export const ApplicationsModal = ({ job, isOpen, onClose }) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '0.5rem',
                     }}
                   >
-                    <div>
-                      <h4 style={{ fontWeight: 600, fontSize: '0.95rem' }}>
-                        {candidate.name || 'Candidate'}
-                      </h4>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                        {candidate.email} • Applied {appliedDate}
-                      </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      {candidate.profileImage ? (
+                        <img
+                          src={candidate.profileImage}
+                          alt={candidate.name}
+                          style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #cbd5e1' }}
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '50%',
+                            background: '#0f172a',
+                            color: '#ffffff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            fontSize: '1rem',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {candidate.name ? candidate.name.charAt(0).toUpperCase() : 'C'}
+                        </div>
+                      )}
+                      <div>
+                        <h4 style={{ fontWeight: 700, fontSize: '0.95rem', color: '#0f172a', margin: 0 }}>
+                          {candidate.name || 'Candidate'}
+                        </h4>
+                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
+                          ✉️ {candidate.email} {candidate.phone ? `• 📞 ${candidate.phone}` : ''} • Applied {appliedDate}
+                        </p>
+                        {(candidate.degree || candidate.batch || candidate.college) && (
+                          <div style={{ marginTop: '0.35rem', display: 'flex', flexWrap: 'wrap', gap: '0.35rem', alignItems: 'center' }}>
+                            {candidate.degree && (
+                              <span className="skill-tag" style={{ background: '#e0f2fe', color: '#0369a1', borderColor: '#bae6fd', fontWeight: 600 }}>
+                                🎓 {candidate.degree}
+                              </span>
+                            )}
+                            {candidate.batch && (
+                              <span className="skill-tag" style={{ background: '#fef3c7', color: '#92400e', borderColor: '#fde68a', fontWeight: 600 }}>
+                                📅 Batch {candidate.batch}
+                              </span>
+                            )}
+                            {candidate.college && (
+                              <span className="skill-tag" style={{ background: '#f1f5f9', color: '#475569' }}>
+                                🏛️ {candidate.college}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <a
@@ -151,7 +200,7 @@ export const ApplicationsModal = ({ job, isOpen, onClose }) => {
                     </span>
                     <select
                       className="form-select"
-                      style={{ padding: '0.35rem 0.6rem', fontSize: '0.825rem' }}
+                      style={{ padding: '0.35rem 0.6rem', fontSize: '0.825rem', width: 'auto' }}
                       value={app.status}
                       disabled={updatingId === app._id}
                       onChange={(e) => handleStatusChange(app._id, e.target.value)}

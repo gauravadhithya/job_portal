@@ -4,14 +4,24 @@ const jwt = require('jsonwebtoken');
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const {
+      name,
+      email,
+      password,
+      role,
+      profileImage,
+      degree,
+      batch,
+      college,
+      phone,
+      companyName,
+      industry,
+      website,
+      location,
+    } = req.body;
 
-    // Public registration is strictly for Job Seekers
-    if (role && role !== 'Job Seeker') {
-      return res.status(403).json({
-        message: 'Recruiter and Admin accounts can only be registered by the Platform Administrator.',
-      });
-    }
+    // Public registration allowed for Job Seeker and Company
+    const userRole = role === 'Company' || role === 'Recruiter' ? 'Company' : 'Job Seeker';
 
     const userExists = await User.findOne({ email: email.trim().toLowerCase() });
     if (userExists) {
@@ -21,19 +31,49 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
+    // Recruiters / Companies require admin approval before they can log in
+    const isApproved = userRole === 'Job Seeker';
+
+    const userData = {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password: hashedPassword,
-      role: 'Job Seeker',
-    });
+      role: userRole,
+      profileImage: profileImage ? profileImage.trim() : '',
+      isApproved,
+    };
+
+    if (userRole === 'Job Seeker') {
+      if (degree) userData.degree = degree.trim();
+      if (batch) userData.batch = batch.trim();
+      if (college) userData.college = college.trim();
+      if (phone) userData.phone = phone.trim();
+    } else {
+      if (companyName) userData.companyName = companyName.trim();
+      if (industry) userData.industry = industry.trim();
+      if (website) userData.website = website.trim();
+      if (location) userData.location = location.trim();
+    }
+
+    const user = await User.create(userData);
 
     res.status(200).json({
       _id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
-      message: 'User registered successfully',
+      profileImage: user.profileImage,
+      isApproved: user.isApproved,
+      degree: user.degree,
+      batch: user.batch,
+      college: user.college,
+      companyName: user.companyName,
+      industry: user.industry,
+      website: user.website,
+      location: user.location,
+      message: isApproved
+        ? 'Account registered successfully!'
+        : 'Registration submitted! Your recruiter/company account is pending approval by the Platform Administrator.',
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -46,24 +86,45 @@ const loginUser = async (req, res) => {
 
     const user = await User.findOne({ email: email.trim().toLowerCase() });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign(
-        { userId: user._id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: '30d' }
-      );
-      res.json({
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token,
-      });
-    } else {
-      res.status(401).json({
-        message: 'Invalid credentials',
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // Check recruiter / company approval status
+    if ((user.role === 'Company' || user.role === 'Recruiter') && user.isApproved === false) {
+      return res.status(403).json({
+        message: 'Your company/recruiter account is currently pending administrator approval. Please wait for the admin to approve your account before signing in.',
       });
     }
+
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    res.json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      profileImage: user.profileImage,
+      isApproved: user.isApproved,
+      degree: user.degree,
+      batch: user.batch,
+      college: user.college,
+      phone: user.phone,
+      companyName: user.companyName,
+      industry: user.industry,
+      website: user.website,
+      location: user.location,
+      token,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

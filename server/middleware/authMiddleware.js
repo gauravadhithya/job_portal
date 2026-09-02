@@ -21,10 +21,18 @@ const protect = async (req, res, next) => {
 
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: `user role ${req.user.role} is not authorized to access this route` });
+    if (!req.user) {
+      return res.status(401).json({ message: "not authenticated" });
     }
-    next();
+
+    const userRole = req.user.role;
+    
+    // Check direct match or Company/Recruiter compatibility
+    if (roles.includes(userRole) || ((roles.includes('Company') || roles.includes('Recruiter')) && (userRole === 'Company' || userRole === 'Recruiter'))) {
+      return next();
+    }
+
+    return res.status(403).json({ message: `User role "${userRole}" is not authorized to access this route` });
   };
 };
 

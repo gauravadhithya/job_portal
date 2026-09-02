@@ -68,7 +68,7 @@ export const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
           <div>
             <h2 className="modal-title">Post a New Job</h2>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Posting as <strong style={{ color: 'var(--text-primary)' }}>{user?.name}</strong>
+              Posting as <strong style={{ color: 'var(--text-primary)' }}>{user?.name}</strong> (Company)
             </p>
           </div>
           <button className="close-btn" onClick={onClose}>
