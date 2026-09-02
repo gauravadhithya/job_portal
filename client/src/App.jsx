@@ -258,60 +258,31 @@ export function App() {
             </div>
           </div>
 
-          {/* RIGHT PARTITION: Interactive Opportunities Showcase */}
-          <div className="landing-right-partition">
-            <div className="showcase-header">
-              <span className="showcase-title" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-                <FiTrendingUp size={15} /> Featured Opportunities
-              </span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Live Openings</span>
-            </div>
-
-            {jobs.slice(0, 3).map((jb) => (
-              <div key={jb._id} className="showcase-item">
-                <div>
-                  <strong style={{ fontSize: '0.9rem', color: '#0f172a', display: 'block' }}>
-                    {jb.title}
-                  </strong>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.15rem' }}>
-                    <BsBuilding size={12} /> {jb.companyName} {jb.location ? `• ` : ''} {jb.location && <><FiMapPin size={11} /> {jb.location}</>}
-                  </span>
-                </div>
-                <button
-                  className="btn btn-primary btn-sm"
-                  style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
-                  onClick={() => handleApplyClick(jb)}
-                >
-                  Apply
-                </button>
-              </div>
-            ))}
-
-            {jobs.length === 0 && (
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem 0' }}>
-                Opportunities are being listed. Check back shortly!
-              </p>
-            )}
-
-            <div style={{ background: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '0.75rem', border: '1px dashed #cbd5e1', textAlign: 'center' }}>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Are you hiring?{' '}
-                <button
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#0f172a',
-                    fontWeight: 700,
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    font: 'inherit',
-                  }}
-                  onClick={() => openRegister('Company')}
-                >
-                  Post your job opening here <FiArrowRight style={{ verticalAlign: 'middle' }} size={12} />
-                </button>
-              </p>
-            </div>
+          {/* RIGHT PARTITION: Hero Vector Illustration replacing Featured Opportunities */}
+          <div
+            className="landing-right-partition"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
+              padding: '0',
+            }}
+          >
+            <img
+              src="/assets/landing-hero.jpg"
+              alt="Work & Career Opportunities"
+              style={{
+                width: '100%',
+                maxWidth: '460px',
+                height: 'auto',
+                maxHeight: '400px',
+                objectFit: 'contain',
+                border: 'none',
+              }}
+            />
           </div>
         </div>
       )}
