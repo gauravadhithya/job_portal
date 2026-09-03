@@ -107,7 +107,11 @@ export const api = {
   },
 
   async getRecruiterJobs(token) {
-    return this.getJobs(token);
+    const res = await fetch(`${API_BASE}/jobs/my-jobs`, {
+      method: 'GET',
+      headers: getHeaders(token),
+    });
+    return handleResponse(res, 'Failed to fetch company jobs');
   },
 
   async createJob(jobData, token) {

@@ -95,4 +95,22 @@ const deleteJob = async (req, res) => {
   }
 };
 
-module.exports = { createJob, getJobs, updateJobStatus, deleteJob };
+const getMyJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({
+      $or: [
+        { recruiterId: req.user._id },
+        { companyId: req.user._id },
+      ],
+    })
+      .populate('recruiterId', 'name email')
+      .populate('companyId', 'name location website')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: 'failed to fetch your jobs', error: error.message });
+  }
+};
+
+module.exports = { createJob, getJobs, getMyJobs, updateJobStatus, deleteJob };
