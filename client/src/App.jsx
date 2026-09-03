@@ -8,6 +8,7 @@ import { ApplyModal } from './components/ApplyModal';
 import { ApplicationsModal } from './components/ApplicationsModal';
 import { MyApplicationsModal } from './components/MyApplicationsModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
+import { AdminCenterView } from './components/AdminCenterView';
 import { UserSidebar } from './components/UserSidebar';
 import { Footer } from './components/Footer';
 import { ProfilePage } from './pages/ProfilePage';
@@ -24,6 +25,8 @@ import {
   FiArrowRight,
   FiX,
   FiAward,
+  FiShield,
+  FiShare2,
 } from 'react-icons/fi';
 import { BsBuilding } from 'react-icons/bs';
 
@@ -227,10 +230,22 @@ export function App() {
 
   const mainPortalContent = (
     <div className="container">
-      {isAuthenticated ? (
-        /* LOGGED IN VIEWS: 2-COLUMN SIDEBAR + FEED LAYOUT FOR ALL ROLES */
+      {isAdmin ? (
+        /* ADMIN EXECUTIVE VIEW: INTEGRATED ADMIN CENTER ATTRIBUTES BAR & DASHBOARD */
+        <AdminCenterView
+          jobs={jobs}
+          onDeleteJob={handleDeleteJob}
+          onApplyClick={handleApplyClick}
+          onViewApplicants={(jb) => setViewingApplicantsJob(jb)}
+          onToggleStatus={handleToggleJobStatus}
+          onRefreshJobs={fetchJobs}
+          onGoProfile={handleGoProfile}
+          userSlug={userSlug}
+        />
+      ) : isAuthenticated ? (
+        /* JOB SEEKER & COMPANY 2-COLUMN SIDEBAR + FEED LAYOUT */
         <div className="portal-feed-layout">
-          {/* Left Column: Role Sidebar (Job Seeker / Company / Admin) */}
+          {/* Left Column: Role Sidebar (Job Seeker / Company) */}
           <aside className="portal-sidebar-column">
             <UserSidebar
               onOpenProfile={handleGoProfile}
@@ -246,9 +261,7 @@ export function App() {
             <div className="jobs-header">
               <div>
                 <h2 className="jobs-title">
-                  {isAdmin
-                    ? 'All Platform Job Listings'
-                    : isCompany
+                  {isCompany
                     ? 'Your Company Postings'
                     : 'Explore All Opportunities'}{' '}
                   ({displayedJobs.length})

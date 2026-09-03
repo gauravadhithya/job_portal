@@ -4,11 +4,14 @@ import {
   FiX,
   FiUser,
   FiInfo,
+  FiEye,
+  FiEyeOff,
 } from 'react-icons/fi';
 import { BsBuilding } from 'react-icons/bs';
 
 export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole = 'Job Seeker' }) => {
   const [mode, setMode] = useState(initialMode); // 'login' | 'register'
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -361,16 +364,39 @@ export const AuthModal = ({ isOpen, onClose, initialMode = 'login', initialRole 
 
           <div className="input-group" style={{ marginBottom: '1.25rem' }}>
             <label className="input-label">Password *</label>
-            <input
-              type="password"
-              name="password"
-              className="form-input"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="new-password"
-              required
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                className="form-input"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="new-password"
+                style={{ paddingRight: '2.5rem' }}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '0.75rem',
+                  background: 'none',
+                  border: 'none',
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0.2rem',
+                }}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+              </button>
+            </div>
           </div>
 
           <button

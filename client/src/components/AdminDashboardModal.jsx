@@ -459,7 +459,7 @@ export const AdminDashboardModal = ({ isOpen, onClose, onRefreshData }) => {
                             onError={(e) => { e.target.style.display = 'none'; }}
                           />
                         ) : (
-                          <FiBuilding size={16} style={{ color: '#64748b' }} />
+                          <BsBuilding size={16} style={{ color: '#64748b' }} />
                         )}
                         <div>
                           <strong style={{ fontSize: '0.95rem' }}>{comp.name}</strong>
