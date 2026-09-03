@@ -106,6 +106,10 @@ export const api = {
     return filteredJobs;
   },
 
+  async getRecruiterJobs(token) {
+    return this.getJobs(token);
+  },
+
   async createJob(jobData, token) {
     const res = await fetch(`${API_BASE}/jobs`, {
       method: 'POST',
@@ -228,7 +232,7 @@ export const api = {
     return handleResponse(res, 'Failed to fetch users');
   },
 
-  async createCompany(companyData, token) {
+  async createAdminCompany(companyData, token) {
     const res = await fetch(`${API_BASE}/admin/companies`, {
       method: 'POST',
       headers: getHeaders(token),
@@ -238,7 +242,7 @@ export const api = {
   },
 
   async createRecruiter(recruiterData, token) {
-    return this.createCompany(recruiterData, token);
+    return this.createAdminCompany(recruiterData, token);
   },
 
   async approveCompany(userId, token) {

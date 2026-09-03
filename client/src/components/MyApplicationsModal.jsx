@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -35,6 +36,8 @@ export const MyApplicationsModal = ({ isOpen, onClose }) => {
       loadApplications();
     }
   }, [isOpen, loadApplications]);
+
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -95,6 +98,13 @@ export const MyApplicationsModal = ({ isOpen, onClose }) => {
                   ? 'status-Rejected'
                   : 'status-Applied';
 
+              const companySlug = encodeURIComponent(companyName.toLowerCase().trim().replace(/\s+/g, '-'));
+
+              const handleCompanyClick = () => {
+                onClose();
+                navigate(`/in/${companySlug}`);
+              };
+
               return (
                 <div
                   key={app._id}
@@ -120,7 +130,22 @@ export const MyApplicationsModal = ({ isOpen, onClose }) => {
                       <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
                         {job.title || 'Position Title'}
                       </h3>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.15rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <p
+                        style={{
+                          fontSize: '0.8rem',
+                          color: 'var(--text-secondary)',
+                          marginTop: '0.15rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          cursor: 'pointer',
+                          width: 'fit-content',
+                        }}
+                        onClick={handleCompanyClick}
+                        title={`View ${companyName}'s profile and job opportunities`}
+                        onMouseOver={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                        onMouseOut={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                      >
                         <BsBuilding size={12} /> {companyName} • <FiMapPin size={11} /> {job.location || 'Remote'}
                       </p>
                     </div>

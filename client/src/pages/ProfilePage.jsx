@@ -15,16 +15,21 @@ import {
   FiCamera,
   FiShare2,
   FiEdit2,
+  FiBriefcase,
 } from 'react-icons/fi';
 import { BsBuilding } from 'react-icons/bs';
 import { PhotoViewerModal } from '../components/PhotoViewerModal';
 import { ProfileModal } from '../components/ProfileModal';
+import { JobCard } from '../components/JobCard';
+import { ApplyModal } from '../components/ApplyModal';
 
 export const ProfilePage = ({ onBack }) => {
   const { username: urlUsername } = useParams();
   const { user, updateUser, isAuthenticated } = useAuth();
 
   const [profileData, setProfileData] = useState(null);
+  const [companyJobs, setCompanyJobs] = useState([]);
+  const [applyingJob, setApplyingJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -46,38 +51,56 @@ export const ProfilePage = ({ onBack }) => {
       setLoading(true);
       setError('');
 
+      let loadedProfile = null;
+
       // If viewing own profile or no username param
       if (!urlUsername && user) {
+        loadedProfile = user;
         setProfileData(user);
-        setLoading(false);
-        return;
-      }
-
-      // If URL has username, load public profile
-      if (urlUsername) {
+      } else if (urlUsername) {
         // If it's the logged-in user
         if (
           user &&
           (urlUsername.toLowerCase().trim() === user.name.toLowerCase().trim().replace(/\s+/g, '-') ||
             urlUsername.toLowerCase().trim() === user.name.toLowerCase().trim())
         ) {
+          loadedProfile = user;
           setProfileData(user);
-          setLoading(false);
-          return;
+        } else {
+          // Otherwise fetch from public profile API
+          try {
+            const publicUser = await api.getPublicProfile(urlUsername);
+            loadedProfile = publicUser;
+            setProfileData(publicUser);
+          } catch (err) {
+            setError(err.message || 'User profile not found.');
+          }
         }
-
-        // Otherwise fetch from public profile API
-        try {
-          const publicUser = await api.getPublicProfile(urlUsername);
-          setProfileData(publicUser);
-        } catch (err) {
-          setError(err.message || 'User profile not found.');
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
       }
+
+      // If loaded profile is a Company or Recruiter, load their jobs
+      if (loadedProfile && (loadedProfile.role === 'Company' || loadedProfile.role === 'Recruiter')) {
+        try {
+          const allJobs = await api.getJobs();
+          const targetName = (loadedProfile.name || '').toLowerCase().trim();
+          const targetId = loadedProfile._id?.toString();
+          const filtered = (Array.isArray(allJobs) ? allJobs : []).filter((j) => {
+            const recruiterId = (j.recruiterId?._id || j.recruiterId)?.toString();
+            const companyId = (j.companyId?._id || j.companyId)?.toString();
+            const recruiterName = (j.recruiterId?.name || '').toLowerCase().trim();
+            const companyName = (j.companyId?.name || j.companyName || '').toLowerCase().trim();
+            return (
+              (targetId && (recruiterId === targetId || companyId === targetId)) ||
+              (targetName && (recruiterName === targetName || companyName === targetName))
+            );
+          });
+          setCompanyJobs(filtered);
+        } catch (err) {
+          console.error('Failed to load company jobs:', err);
+        }
+      }
+
+      setLoading(false);
     };
 
     fetchProfile();
@@ -263,17 +286,6 @@ export const ProfilePage = ({ onBack }) => {
               >
                 {activeProfile.role || 'Job Seeker'}
               </span>
-
-              {isOwner && (
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => setShowEditProfileModal(true)}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem' }}
-                >
-                  <FiEdit2 size={12} /> Edit Details
-                </button>
-              )}
             </div>
           </div>
 
@@ -301,21 +313,10 @@ export const ProfilePage = ({ onBack }) => {
           boxShadow: 'var(--shadow-sm)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div style={{ marginBottom: '1.25rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
             {isJobSeekerProfile ? 'Candidate Profile Details' : 'Company Overview'}
           </h2>
-
-          {isOwner && (
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => setShowEditProfileModal(true)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem' }}
-            >
-              <FiEdit2 size={12} /> Update Information
-            </button>
-          )}
         </div>
 
         {/* Display Cards */}
@@ -359,8 +360,28 @@ export const ProfilePage = ({ onBack }) => {
               {activeProfile.website && (
                 <div style={publicItemCardStyle}>
                   <span style={publicItemLabelStyle}><FiGlobe size={13} /> Website</span>
-                  <a href={activeProfile.website} target="_blank" rel="noopener noreferrer" style={{ color: '#0f172a', fontWeight: 700, textDecoration: 'underline' }}>
-                    {activeProfile.website}
+                  <a
+                    href={activeProfile.website.startsWith('http') ? activeProfile.website : `https://${activeProfile.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: '#0f172a',
+                      fontWeight: 700,
+                      textDecoration: 'underline',
+                      fontSize: '1rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      wordBreak: 'break-all',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: '100%',
+                    }}
+                    title={activeProfile.website}
+                  >
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {activeProfile.website.replace(/^https?:\/\/(www\.)?/, '')}
+                    </span>
                   </a>
                 </div>
               )}
@@ -388,6 +409,44 @@ export const ProfilePage = ({ onBack }) => {
           </button>
         </div>
       </div>
+
+      {/* COMPANY JOB OPPORTUNITIES SECTION */}
+      {isCompanyProfile && (
+        <div style={{ marginTop: '2rem' }}>
+          <div style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <FiBriefcase size={20} /> Open Positions & Opportunities ({companyJobs.length})
+            </h2>
+          </div>
+
+          {companyJobs.length === 0 ? (
+            <div className="empty-state" style={{ padding: '2.5rem 1.5rem', background: '#ffffff', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+              <FiBriefcase size={32} style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }} />
+              <h3 style={{ fontSize: '1.05rem', color: '#0f172a' }}>No active job listings currently</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                {activeProfile.name} has not posted any open positions at the moment. Check back soon!
+              </p>
+            </div>
+          ) : (
+            <div className="jobs-grid">
+              {companyJobs.map((job) => (
+                <JobCard
+                  key={job._id}
+                  job={job}
+                  onApply={(j) => setApplyingJob(j)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Apply Modal */}
+      <ApplyModal
+        job={applyingJob}
+        isOpen={!!applyingJob}
+        onClose={() => setApplyingJob(null)}
+      />
 
       {/* Zoomed-in Photo Viewer & Manager Modal */}
       <PhotoViewerModal
@@ -417,6 +476,8 @@ const publicItemCardStyle = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
+  minWidth: 0,
+  overflow: 'hidden',
 };
 
 const publicItemLabelStyle = {

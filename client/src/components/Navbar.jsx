@@ -199,32 +199,12 @@ export const Navbar = ({
         {/* Right Side: Actions & Sign In/Out */}
         <div className="nav-actions">
           {isAuthenticated ? (
-            <>
-              {isCompany && (
-                <button 
-                  className="btn btn-primary btn-sm"
-                  onClick={onOpenPostJob}
-                >
-                  <FiPlus size={14} /> Post a Job
-                </button>
-              )}
-
-              {isAdmin && (
-                <button
-                  className="btn btn-secondary btn-sm"
-                  onClick={onOpenAdminDashboard}
-                >
-                  <FiShield size={14} /> Admin Center
-                </button>
-              )}
-
-              <button 
-                className="btn btn-secondary btn-sm"
-                onClick={logout}
-              >
-                <FiLogOut size={13} /> Sign Out
-              </button>
-            </>
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={logout}
+            >
+              <FiLogOut size={13} /> Sign Out
+            </button>
           ) : (
             <button 
               className="btn btn-primary"
