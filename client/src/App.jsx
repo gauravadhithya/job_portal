@@ -106,9 +106,25 @@ export function App() {
   // Unified Single Search Filter
   const displayedJobs = useMemo(() => {
     return jobs.filter((job) => {
-      // Company status filter
-      if (isCompany && !isAdmin && companyStatusFilter !== 'All') {
-        if (job.status !== companyStatusFilter) return false;
+      // For Company users, strictly filter to show ONLY jobs belonging to this company
+      if (isCompany && !isAdmin) {
+        const recruiterId = (job.recruiterId?._id || job.recruiterId)?.toString();
+        const companyId = (job.companyId?._id || job.companyId)?.toString();
+        const currentUserId = user?._id?.toString();
+        const currentUserName = (user?.name || '').toLowerCase().trim();
+        const recruiterName = (job.recruiterId?.name || '').toLowerCase().trim();
+        const companyName = (job.companyId?.name || job.companyName || '').toLowerCase().trim();
+
+        const belongsToUser =
+          (currentUserId && (recruiterId === currentUserId || companyId === currentUserId)) ||
+          (currentUserName && (recruiterName === currentUserName || companyName === currentUserName));
+
+        if (!belongsToUser) return false;
+
+        // Company status filter
+        if (companyStatusFilter !== 'All' && job.status !== companyStatusFilter) {
+          return false;
+        }
       }
 
       // Single Unified Search matching title, company, skills, or location
@@ -126,7 +142,7 @@ export function App() {
 
       return true;
     });
-  }, [jobs, searchQuery, isCompany, isAdmin, companyStatusFilter]);
+  }, [jobs, searchQuery, isCompany, isAdmin, companyStatusFilter, user]);
 
   // Metrics & Company Spotlight for Guest Landing Page
   const landingOverview = useMemo(() => {
